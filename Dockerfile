@@ -1,6 +1,6 @@
 FROM      debian:jessie
 #FROM ubuntu
-MAINTAINER Camille Vaucelle <camille@organiknowledge.com>
+MAINTAINER Camille Vaucelle <camille@vaucelle.org>
 
 
 RUN \
