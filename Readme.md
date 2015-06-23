@@ -14,49 +14,94 @@ What you need
 
 What you do
 -----
-2.  Init a git bare repository
+0.  Setup variables
+
+this is all the variable used
+<code>
+export CONTAINER_NAME=webserver
+export CONTAINER_PORT=
+export GIT_REPO=/var/git/my_repo/
+export URL=www.mywebsite.com
+</code>
+
+1.  Source set-up
+
+ * Init a git bare repository
+
+<code>
+git init --bare $GIT_REPO
+</code>
+
  *  add the following hook in hooks/post-receive :
 
+<code>
 #!/bin/bash
+CONTAINER_NAME=webserver
 echo "Received a commit on the acc server"
- 
-1. Run the container :
-docker run -d -p 8001:80 --volume /var/git/en.organiknowledge.com/:/var/repository -v /var/log/$MYSITE:/var/log/nginx --name server staticwebgitted:latest
+docker exec $CONTAINER_NAME /root/deploy.sh > /dev/null && echo "Website updated !"
+</code>
+
+ * **DO NOT FORGET
+
+<code>
+chmod u+x $GIT_REPO/hooks/post-receive
+
+2. Run the CONTAINER_NAME :
+
+<code>
+docker run -d \
+   `[ -z "$CONTAINER_PORT" ] && echo "-p $CONTAINER_PORT:80"` \
+   `[ -n "$CONTAINER_PORT" ] && echo "-P"` \
+   -v $GIT_REPO:/var/repository \
+   -v /var/log/$CONTAINER_NAME:/var/log/nginx \
+   --name $CONTAINER_NAME \
+   staticwebgitted:latest
+</code>
+
+3. Configure your host proxy
+
+* for an nginx webserver
+
+<code>
+upstream $CONTAINER_NAME {
+    server 127.0.0.1:$CONTAINER_PORT;
+}
+server {
+    listen 80;
+    server_name $URL;
+
+    location / {
+        proxy_pass http://$CONTAINER_NAME;
+    }
+}
+</code>
 
 
+*******
 
-How to build Container
+Docker tricks
+======
+
+How to build the image
 ------
-
-CONTAINER_NAME=server
-URL=en.organiknowledge.com
 
 docker build -t staticwebgitted .
 
-#Init bare repo
-
-#Sart Server
-
-docker run -d -p 8001:80 --volume /var/git/en.organiknowledge.com/:/var/repository --name server staticwebgitted:latest
-
-#logs can be mounted
-docker run -d -p 8001:80 --volume /var/git/en.organiknowledge.com/:/var/repository -v /var/log/$MYSITE:/var/log/nginx --name server staticwebgitted:latest
-
-
-#Take the hand on the server
+Take the hand on the server
+------
 
 docker exec -it $CONTAINER_NAME bash
 
 
-# Make it deploy 
-docker exec -it server /root/deploy.sh
-
+*******
+More
+=======
 
 Inspirations & Sources
 -------
 
 https://github.com/docker-library/buildpack-deps/blob/master/jessie/Dockerfile
-source container
+source CONTAINER_NAME
 
 https://www.digitalocean.com/community/tutorials/how-to-deploy-jekyll-blogs-with-git
 Good, but without Nginx nor Docker.. Good if you got 1 website, not if you deploy lots of them on https://www.google.com/search?client=safari&rls=en&q=heterogenous&ie=UTF-8&oe=UTF-8#q=heterogeneous environments
@@ -69,10 +114,11 @@ A must read
 
 Todo
 --------
-Improve log management and infos
-=> + a new repo on vizualization
+Add unit testing with Travis
 
-Propose different containers for different  versions of jekyll on different branches ?
+Improve log management and infos
+
+Propose different CONTAINER_NAMEs for different  versions of jekyll on different branches ?
 => https://github.com/jekyll/jekyll/issues/2327
 
 Use baseimage-docker ?
