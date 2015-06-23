@@ -125,3 +125,6 @@ Use baseimage-docker ?
 => https://github.com/phusion/baseimage-docker
 => really ? even if https://jpetazzo.github.io/2014/06/23/docker-ssh-considered-evil/ ?
 
+## License
+
+This application is distributed under the [Apache License, Version 2.0][5].
