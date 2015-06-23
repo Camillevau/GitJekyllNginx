@@ -1,54 +1,50 @@
-StaticWebsiteGitted
-======================
+#StaticWebsiteGitted
 
-What is StaticWebGitted?
-------
+This is a solution to rapidly deploy a static website with git, [Jekyll][2], [Nginx][3] and [Docker][4]
 
-StaticWebsiteGitted is a solution to rapidly deploy a static website with git, Jekyll, Nginx and Docker
-
-What you need
------
+## How to use
+###What you need
 
  * A local gitted Jekyll website
  * A remote server with ssh, git and docker installed
 
-What you do
------
-0.  Setup variables
+### Setup variables
+some variable are necessary to commands or config files
 
-this is all the variable used
-<code>
+````
 export CONTAINER_NAME=webserver
+#optional
 export CONTAINER_PORT=
 export GIT_REPO=/var/git/my_repo/
 export URL=www.mywebsite.com
-</code>
+````
 
-1.  Source set-up
+### Git repository set-up
 
  * Init a git bare repository
 
-<code>
+````
 git init --bare $GIT_REPO
-</code>
+````
 
  *  add the following hook in hooks/post-receive :
 
-<code>
+````
 #!/bin/bash
 CONTAINER_NAME=webserver
 echo "Received a commit on the acc server"
 docker exec $CONTAINER_NAME /root/deploy.sh > /dev/null && echo "Website updated !"
-</code>
+````
 
- * **DO NOT FORGET
-
-<code>
+ * DO NOT FORGET
+	
+````
 chmod u+x $GIT_REPO/hooks/post-receive
+````
 
-2. Run the CONTAINER_NAME :
+### Run the container
 
-<code>
+````
 docker run -d \
    `[ -z "$CONTAINER_PORT" ] && echo "-p $CONTAINER_PORT:80"` \
    `[ -n "$CONTAINER_PORT" ] && echo "-P"` \
@@ -56,13 +52,13 @@ docker run -d \
    -v /var/log/$CONTAINER_NAME:/var/log/nginx \
    --name $CONTAINER_NAME \
    staticwebgitted:latest
-</code>
+````
 
-3. Configure your host proxy
+### Configure your host proxy
 
 * for an nginx webserver
 
-<code>
+````
 upstream $CONTAINER_NAME {
     server 127.0.0.1:$CONTAINER_PORT;
 }
@@ -74,37 +70,36 @@ server {
         proxy_pass http://$CONTAINER_NAME;
     }
 }
-</code>
+````
 
 
-*******
 
-Docker tricks
-======
+##Docker tricks
 
-How to build the image
-------
+###How to build the image
 
+````
 docker build -t staticwebgitted .
+````
 
-Take the hand on the server
-------
+###Take the hand on the server
 
+````
 docker exec -it $CONTAINER_NAME bash
+````
 
 
-*******
-More
-=======
+##More
 
-Inspirations & Sources
--------
+###Inspirations & Sources
 
 https://github.com/docker-library/buildpack-deps/blob/master/jessie/Dockerfile
 source CONTAINER_NAME
 
 https://www.digitalocean.com/community/tutorials/how-to-deploy-jekyll-blogs-with-git
-Good, but without Nginx nor Docker.. Good if you got 1 website, not if you deploy lots of them on https://www.google.com/search?client=safari&rls=en&q=heterogenous&ie=UTF-8&oe=UTF-8#q=heterogeneous environments
+Good, but without Nginx nor Docker.
+
+https://www.google.com/search?client=safari&rls=en&q=heterogenous&ie=UTF-8&oe=UTF-8#q=heterogeneous environments
 
 https://docs.docker.com/reference/builder/
 https://docs.docker.com/articles/dockerfile_best-practices/
@@ -112,8 +107,8 @@ http://kimh.github.io/blog/en/docker/gotchas-in-writing-dockerfile-en/
 A must read
 
 
-Todo
---------
+###Todo
+
 Add unit testing with Travis
 
 Improve log management and infos
@@ -127,4 +122,9 @@ Use baseimage-docker ?
 
 ## License
 
-This application is distributed under the [Apache License, Version 2.0][5].
+This application is distributed under the [Apache License, Version 2.0][1].
+
+[1]: http://www.apache.org/licenses/LICENSE-2.0
+[2]: http://jekyllrb.com
+[3]: http://nginx.com
+[4]: http://docker.com
