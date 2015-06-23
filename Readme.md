@@ -1,4 +1,4 @@
-#StaticWebsiteGitted
+#GitJekyllNginx
 
 This is a solution to rapidly deploy a static website with git, [Jekyll][2], [Nginx][3] and [Docker][4]
 
@@ -13,10 +13,10 @@ some variable are necessary to commands or config files
 
 ````
 export CONTAINER_NAME=webserver
-#optional
-export CONTAINER_PORT=
 export GIT_REPO=/var/git/my_repo/
 export URL=www.mywebsite.com
+#optional
+export CONTAINER_PORT=
 ````
 
 ### Git repository set-up
@@ -51,7 +51,7 @@ docker run -d \
    -v $GIT_REPO:/var/repository \
    -v /var/log/$CONTAINER_NAME:/var/log/nginx \
    --name $CONTAINER_NAME \
-   staticwebgitted:latest
+   camillevau/gitjekyllnginx:latest
 ````
 
 ### Configure your host proxy
@@ -79,7 +79,7 @@ server {
 ###How to build the image
 
 ````
-docker build -t staticwebgitted .
+docker build -t gitjekyllnginx .
 ````
 
 ###Take the hand on the server
