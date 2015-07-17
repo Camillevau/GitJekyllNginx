@@ -16,42 +16,19 @@ export CONTAINER_NAME=webserver
 export GIT_REPO=/var/git/my_repo/
 export URL=www.mywebsite.com
 #optional
-export CONTAINER_PORT=
+export CONTAINER_PORT=8080
 ````
 
 ### Git repository set-up
-
- * Init a git bare repository
 
 ````
 git init --bare $GIT_REPO
 ````
 
- *  add the following hook in hooks/post-receive :
+### init docker repo
 
 ````
-#!/bin/bash
-CONTAINER_NAME=webserver
-echo "Received a commit on the acc server"
-docker exec $CONTAINER_NAME /root/deploy.sh > /dev/null && echo "Website updated !"
-````
-
- * DO NOT FORGET
-	
-````
-chmod u+x $GIT_REPO/hooks/post-receive
-````
-
-### Run the container
-
-````
-docker run -d \
-   `[ -z "$CONTAINER_PORT" ] && echo "-p $CONTAINER_PORT:80"` \
-   `[ -n "$CONTAINER_PORT" ] && echo "-P"` \
-   -v $GIT_REPO:/var/repository \
-   -v /var/log/$CONTAINER_NAME:/var/log/nginx \
-   --name $CONTAINER_NAME \
-   camillevau/gitjekyllnginx:latest
+./startContainer.sh $GIT_REPO $CONTAINER_NAME $CONTAINER_PORT
 ````
 
 ### Configure your host proxy
@@ -72,6 +49,10 @@ server {
 }
 ````
 
+### Push your jekyll web site into your bare repo
+
+
+git push user@server:$GIT_REPO [branch]
 
 
 ##Docker tricks
