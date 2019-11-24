@@ -1,5 +1,0 @@
-#!/bin/bash
-CONTAINER_NAME=webserver
-echo "Received a commit on the server"
-docker exec $CONTAINER_NAME /root/deploy.sh > /dev/null && echo "Website updated !"
-
