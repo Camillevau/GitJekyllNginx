@@ -1,5 +1,5 @@
 FROM      debian:jessie
-MAINTAINER Camille Vaucelle <camille@vaucelle.org>
+LABEL maintainer="camille@vaucelle.org"
 
 
 RUN \
